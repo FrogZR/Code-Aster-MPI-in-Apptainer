@@ -1,8 +1,7 @@
 # Code-Aster-MPI-in-Apptainer
 
 18.05.2025 Build CA dev 17.2.20 and 16.7.11
-________________________________________________________________________________________________________
-
+## Intro
 Based on 
 - https://github.com/emefff/Code-Aster-MPI-in-Singularity-of-SM2022/blob/main/README.md
 - https://github.com/bursica/Code_Aster-MPI-in-Singularity-of-SM2022/blob/main/README.md
@@ -16,8 +15,7 @@ For info on which container to use for which CA version see https://gitlab.com/c
 A big thanks of course goes to EDF's R&D-Team, the developers of Salome-Meca and Code_Aster 👍. 
 
 This recipe and the resulting container were tested in Fedora 42.(see Code_Aster forum https://code-aster.org/V2/spip.php?rubrique2 for these known minor issues).
-________________________________________________________________________________________________________
-
+## Prepare the container 
 If you do not have singularity installed, the easiest way is to install the package or install apptainer (succsessor of singularity). Apptainer ([https://apptainer.org/](https://apptainer.org/)) will also be able to run the command singularity.
 
 ```
@@ -44,8 +42,7 @@ Now we put the container file into a sandbox directory
 ```
 sudo singularity build --sandbox ca_sbox salome_meca-lgpl-2022.1.0-1-20221225-scibian-9.sif
 ```
-
-________________________________________________________________________________________________________
+## Prepare the soucrecode 
 Now we will download the Code_Aster repository from Gitlab. Some of the below instructions can be found here: https://gitlab.com/codeaster-opensource-documentation/opensource-installation-development/-/blob/main/devel/compile.md#preparing-the-access-to-the-container but not all of them are necessary.
 
 We clone the whole repository with
@@ -60,7 +57,6 @@ If you want to use and install multiple new code_aster version clone the src int
 ```
 git clone https://gitlab.com/codeaster/src.git src17220
 ```
-
 ________________________________________________________________________________________________________
 Now we select the rigth version of code_aster
 
@@ -80,7 +76,7 @@ pkginfo = [(17, 2, 20), 'n/a', 'n/a', '16/05/2025', 'n/a', 1, ['no source reposi
 cd ..
 cd ..
 ```
-________________________________________________________________________________________________________
+## Run the container and build the new version (s)
 All is perpared for  running the conatainer in write mode 
 
 ``` 
@@ -111,7 +107,7 @@ cat ${TOOLS}/Code_aster_frontend-202200/etc/codeaster/aster
 
 Singularity> exit
 ```
-
+## Rebuild the container file 
 We are now in our normal Linux shell, outside the container. 
 
 The container has to be rebulid
@@ -131,15 +127,14 @@ apptainer build my_new_ca_17220.sif ca_sbox/
 ```
 
 And the sandbox directory ca_sbox can be deleted as well as the orginal sif file.
-_______________________________________________________________________________________________________
-
-
+## Run code_aster in batch mode 
 
 Exceute the code_aster in batch mode 
 ```
 apptainer exec ~/dec/codeaster/my_new_ca.sif salome shell -- as_run <PATH_TO_EXPORT_FILE>
 ```
 
+_______________________________________________________________________________________________________
 kermit_zr@online.ms
 
 
