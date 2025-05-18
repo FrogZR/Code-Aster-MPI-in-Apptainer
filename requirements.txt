@@ -1,5 +1,5 @@
 appdirs==1.4.4
-# astk==2021.0
+astk==2021.0
 astroid==2.11.7
 backcall==0.2.0
 bcrypt==3.1.7
