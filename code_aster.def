@@ -1,0 +1,76 @@
+Bootstrap: docker
+From: fedora:42
+
+%environment
+    export PATH=/opt/code_aster/bin:$PATH
+    export LD_LIBRARY_PATH=/opt/code_aster/lib:$LD_LIBRARY_PATH
+
+%files
+    requirements.txt /opt/requirements.txt
+    
+%post
+    # Set non-interactive mode for DNF
+    export DEBIAN_FRONTEND=noninteractive
+
+    # Update package repositories
+    # dnf -y update
+
+    # Install essential development tools and libraries
+    dnf -y group install development-tools setopt=group_package_types=optional --skip-unavailable
+
+    # Install additional required packages
+    dnf -y install \
+        gcc gcc-c++ gcc-gfortran make cmake git wget curl \
+        blas-devel lapack-devel \
+        openmpi openmpi-devel \
+        hdf5 hdf5-devel hdf5-openmpi hdf5-openmpi-devel \
+        scotch scotch-devel \
+        metis metis-devel \
+        med med-devel \
+        zlib-devel pkgconf-pkg-config \
+        which    
+    # python3 python3-devel python3-pip \ 
+    
+    
+    dnf -y install python3.6 python3-devel python3-pip 
+    # pip freeze > requirements.txt	
+    
+    # pip install -r /opt/requirements.txt 
+    # line by line and ignore errors 
+    cat /opt/requirements.txt | sed -e '/^\s*#.*$/d' -e '/^\s*$/d' | xargs -n 1 pip install || true
+    
+    # special installation
+    # dnf -y install python3-numpy 
+    
+    # python3 -c "import numpy; print(numpy.__file__)"
+    # python3 --version
+    
+    # Upgrade pip and install Python packages
+    # pip3 install --upgrade pip
+    # pip3 install numpy==1.15.4 scipy matplotlib pandas
+    
+    # Attempt to install optional components
+    dnf -y install mumps mumps-devel ptscotch ptscotch-devel --skip-unavailable || echo "Optional packages not available."
+   
+    # Set environment variables for OpenMPI
+    export PATH=/usr/lib64/openmpi/bin:$PATH
+    export LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:$LD_LIBRARY_PATH
+
+    
+    # Create working directory
+    mkdir -p /opt/code_aster
+    cd /opt/code_aster
+
+    # Clone source
+    git clone https://gitlab.com/codeaster/devtools.git
+    git clone https://gitlab.com/codeaster/src.git
+    cd src
+
+    # Configure and build Code_Aster
+    ./waf configure --prefix=/opt/code_aster --download
+    ./waf build -j$(nproc)
+    ./waf install
+
+%runscript
+    echo "Running Code_Aster..."
+    exec as_run "$@"
